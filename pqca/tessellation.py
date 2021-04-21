@@ -128,18 +128,3 @@ def n_dimensional(qubits_in_each_dimension: List[int],
              for cell in cells_as_vectors]
 
     return Tessellation(cells)
-
-
-def blank_lattice(qubits_in_each_dimension: List[int]):
-    """Create a lattice of points of the given size."""
-    iterators = [range(0, number_in_this_dimension)
-                 for number_in_this_dimension in qubits_in_each_dimension]
-
-    def expand_points(list_of_points: List[Vector], iterator: Iterable):
-        return [point.extend(next_entry) for point in list_of_points for next_entry in iterator]
-
-    all_points = [Vector(())]
-    for iterator in iterators:
-        all_points = expand_points(all_points, iterator)
-
-    return all_points
