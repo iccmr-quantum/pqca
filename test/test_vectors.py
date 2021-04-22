@@ -1,7 +1,8 @@
 """Test the Vector class."""
 
+#pylint: disable=import-error
 import pytest
-import pqca #pylint: disable=import-error
+import pqca
 
 
 def test_vector_creation():

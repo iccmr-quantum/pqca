@@ -1,9 +1,10 @@
 """Test tessellation of circuits."""
 
+# pylint: disable=import-error
 import itertools
 import re
 import pytest
-import pqca  # pylint: disable=import-error
+import pqca
 
 
 def test_create_one_dimensional():

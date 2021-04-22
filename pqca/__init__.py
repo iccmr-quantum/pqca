@@ -37,7 +37,7 @@ class PQCA:
         self.frames = frames
         self.backend = backend
         self.update_instruction = [instruction for
-                                   instructions in map(lambda f: f.tessellated_gates, self.frames) for
+                                   instructions in map(lambda f: f.full_circuit_instructions, self.frames) for
                                    instruction in instructions]
 
         size = len(initial_state)

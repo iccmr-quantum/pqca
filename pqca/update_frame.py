@@ -2,8 +2,10 @@
 
 """
 
-from qiskit import QuantumCircuit
 import re
+from typing import List
+from qiskit import QuantumCircuit
+from qiskit.circuit.quantumregister import Qubit, QuantumRegister
 from .tessellation import Tessellation
 from .exceptions import (TooLittleDataForUpdateFrame,
                          TooMuchDataForUpdateFrame,
@@ -15,7 +17,7 @@ class UpdateFrame:
     """Create a large circuit from a tessellated small circuit."""
     cell_circuit: QuantumCircuit
     tessellation: Tessellation
-    tessellated_circuit: Tessellation
+    full_circuit_instructions: List
 
     def __init__(self,
                  tessellation: Tessellation,
@@ -42,24 +44,20 @@ class UpdateFrame:
             self.cell_circuit = qiskit_circuit
 
         self.tessellation = tessellation
-        self.tessellated_gates = wind_circuit_around_loop(
+        self.full_circuit_instructions = wind_circuit_around_loop(
             self.cell_circuit, self.tessellation)
 
     def __repr__(self):
         return f"""UpdateFrame(circuit: {self.cell_circuit}
         on each cell of {str(self.tessellation)},
-        resulting in circuit {self.tessellated_gates})"""
+        resulting in circuit {self.full_circuit_instructions})"""
 
     def __str__(self):
         return f"UpdateFrame(circuit: {self.cell_circuit} on each cell of {str(self.tessellation)})"
 
 
 def wind_circuit_around_loop(circuit: QuantumCircuit, tessellation: Tessellation):
-    "Returns the tessellated circuit as a sequence of qasm instructions"
-    # Need to interpret OpenQasm strings
-    # Going to assume that all qubits are referred to as q[\d+]00
-
-    from qiskit.circuit.quantumregister import Qubit, QuantumRegister
+    """Return the tessellated circuit as a list of instructions."""
 
     if len(circuit.qubits) > len(tessellation.cells[0]):
         raise CircuitWrongShapeForCell(
