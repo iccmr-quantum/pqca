@@ -2,6 +2,7 @@
 from __future__ import annotations
 from typing import List, Callable, Tuple, Iterable
 import itertools
+import functools
 from .exceptions import IrregularCellSize, EmptyCellException
 from .vector import Vector
 
@@ -49,7 +50,8 @@ class Tessellation:
             return Tessellation([[name_update(c) for c in cell] for cell in self.cells])
 
     def __str__(self):
-        return f"""Tessellation({self.size} qubits as {len(self.cells)} cells, first cell: {self.cells[0]})"""
+        return f"Tessellation({self.size} qubits as " +\
+            f"{len(self.cells)} cells, first cell: {self.cells[0]})"
 
 
 def line_with_cells(cell_size: int, cell_count: int):
@@ -75,56 +77,53 @@ def cell_of_given_size(cell_dimension: List[int]) -> List[Vector]:
 
 
 def n_dimensional(qubits_in_each_dimension: List[int],
-                  cell_dimension: List[int]) -> Tessellation:
+                  cell_size: List[int]) -> Tessellation:
     """Partition an n-dimensional lattice into n-dimensional cuboids.
 
     example qubits_in_each_dimension: [5,5,10] for a cuboid of size 5 by 5 by 10
-    example cell_dimension: [5,5,2]
+    example cell_size: [5,5,2]
 
     Note that the size of the cell must divide (for each dimension) the number
     of qubits in the lattice.
     """
     for index, length in enumerate(qubits_in_each_dimension):
-        assert length % cell_dimension[index] == 0
-
-    number_steps_in_any_dimension = [
-        int(a/b) for (a, b) in zip(qubits_in_each_dimension, cell_dimension)]
-
-    # Find the focal (first) point in each cell
-    step_data: List[Tuple[int, int]] = zip(
-        qubits_in_each_dimension, number_steps_in_any_dimension)
+        assert length % cell_size[index] == 0
 
     focal_points_as_product = itertools.product(
-        *list(map(lambda step_dim: list(range(0, step_dim[0], step_dim[1])), step_data))
+        *[range(0, qubits_in_each_dimension[index], cell_size[index])
+         for index, _ in enumerate(qubits_in_each_dimension)]
     )
 
+    # "Starting" point in each cell
     focal_points = map(Vector, list(focal_points_as_product))
 
-    # Find all the other points from a focal point
+    # Points in first cell
+    points_in_first_cell = cell_of_given_size(cell_size)
 
-    points_in_first_cell = cell_of_given_size(cell_dimension)
-
+    # List of list of vectors
     cells_as_vectors = [[focal_point + delta for delta in points_in_first_cell]
                         for focal_point in focal_points]
 
-    print(cells_as_vectors)
-
-    # Need to turn n-dimensional data into a single number
-    # This is because our qubits are numbered 0...n
-    def multiplicative_rename_scale(dimension: int):
-        acc = 1
-        for dim in range(0, dimension):
-            acc *= qubits_in_each_dimension[dim]
-        return acc
-
-    def vector_to_name(qubit_vector: Vector):
-        acc = 0
-        for index, entry in enumerate(qubit_vector):
-            acc += entry*multiplicative_rename_scale(index)
-        return acc
-
-    # From a cell described as vectors give a cell as qubit names
-    cells = [[vector_to_name(qubit_vector) for qubit_vector in cell]
+    # List of list of names (as integers)
+    cells = [[vector_to_name(qubit_vector, qubits_in_each_dimension) for qubit_vector in cell]
              for cell in cells_as_vectors]
 
     return Tessellation(cells)
+
+
+def vector_to_name(qubit_vector: Vector, qubits_in_each_dimension: List[int]):
+    """Find the point in a lexicographic order for a vector.
+
+    This turns a vector in the lattice into an unique "name" (int),
+    allowing a linear collection of qubits to represent a lattice.
+    """
+    def sum_weighted_lengths(index, length, acc):
+        """From an initial segment of qubits_in_each_dimension make a weighting."""
+        def multiply(acc, entry):
+            return entry*acc
+        return acc + length * functools.reduce(multiply, qubits_in_each_dimension[index+1:], 1)
+
+    def unpack(acc, index_entry):
+        return sum_weighted_lengths(index_entry[0], index_entry[1], acc)
+
+    return functools.reduce(unpack, enumerate(qubit_vector.entries), 0)
