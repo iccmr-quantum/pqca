@@ -9,8 +9,7 @@ from qiskit.circuit.quantumregister import Qubit, QuantumRegister
 from .tessellation import Tessellation
 from .exceptions import (TooLittleDataForUpdateFrame,
                          TooMuchDataForUpdateFrame,
-                         CircuitWrongShapeForCell,
-                         TooManyRegistersInCircuit)
+                         CircuitWrongShapeForCell)
 
 
 class UpdateFrame:
@@ -27,30 +26,25 @@ class UpdateFrame:
         """Holds the circuit to be applied to each cell in the tessellation.
 
         """
-        # actually want to check if has to_qasm
         count_arguments_not_none: int = len([arg for arg in (
             qasm_circuit_file, qasm_data_as_string, qiskit_circuit) if arg is not None])
         if count_arguments_not_none == 0:
             raise TooLittleDataForUpdateFrame
         elif count_arguments_not_none > 1:
             raise TooMuchDataForUpdateFrame
-        if qasm_data_as_string:
+
+        if qasm_data_as_string is not None:
             self.cell_circuit = QuantumCircuit.from_qasm_str(
                 qasm_data_as_string)
-        if qasm_circuit_file:
+        if qasm_circuit_file is not None:
             self.cell_circuit = QuantumCircuit.from_qasm_file(
                 qasm_circuit_file)
-        if qiskit_circuit:
+        if qiskit_circuit is not None:
             self.cell_circuit = qiskit_circuit
 
         self.tessellation = tessellation
         self.full_circuit_instructions = wind_circuit_around_loop(
             self.cell_circuit, self.tessellation)
-
-    def __repr__(self):
-        return f"""UpdateFrame(circuit: {self.cell_circuit}
-        on each cell of {str(self.tessellation)},
-        resulting in circuit {self.full_circuit_instructions})"""
 
     def __str__(self):
         return f"UpdateFrame(circuit: {self.cell_circuit} on each cell of {str(self.tessellation)})"
@@ -64,9 +58,6 @@ def wind_circuit_around_loop(circuit: QuantumCircuit, tessellation: Tessellation
             circuit.qubits, len(tessellation.cells[0]))
     next_column = []
 
-    if len(circuit.qregs) > 1:
-        raise TooManyRegistersInCircuit(circuit.qregs)
-
     qreg = QuantumRegister(tessellation.size, circuit.qregs[0].name)
 
     for cell in tessellation.cells:
@@ -76,6 +67,3 @@ def wind_circuit_around_loop(circuit: QuantumCircuit, tessellation: Tessellation
                 Qubit(qreg, cell[q.index]) for q in qargs], cargs
             next_column.append(instruction_context)
     return next_column
-
-
-__all__ = ["UpdateFrame"]

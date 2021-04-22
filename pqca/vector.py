@@ -1,6 +1,5 @@
 """Simple n-dimensional, extendable vector of ints"""
 
-
 from __future__ import annotations
 from typing import Callable, List, Tuple
 

@@ -1,9 +1,10 @@
-"""Partition a list of qubits into a tessellation of cells."""
+"""Create a tessellation from a list of qubits."""
+
 from __future__ import annotations
 from typing import List, Callable, Tuple, Iterable
 import itertools
 import functools
-from .exceptions import IrregularCellSize, EmptyCellException
+from . import exceptions
 from .vector import Vector
 
 
@@ -14,18 +15,22 @@ class Tessellation:
     size: int
 
     def __init__(self, cells: List[int]):
-        assert len(cells) > 0, "There must be at least one cell"
-        assert len(
-            cells[0]) > 0, "There must be at least one qubit in the first cell"
+        """Treat a list of cells as a tessellation."""
+        if len(cells) == 0:
+            raise exceptions.NoCellsException
+        if len(cells[0]) == 0:
+            raise exceptions.EmptyCellException
+
         self.cells = cells
         self.size = sum([len(c) for c in cells])
+
         # check no qubit appears twice
-        set_of_cells = set([c for cell in self.cells for c in cell])
-        assert len(
-            set_of_cells) == self.size, "At least one qubit appears in more than one cell"
+        set_of_qubits = {q for cell in self.cells for q in cell}
+        if len(set_of_qubits) != self.size:
+            raise exceptions.PartitionUnevenlyCoversQubits(cells)
         # check all cells the same size
-        assert len(set([len(cell) for cell in cells])
-                   ) == 1, "Not all cells are the same size"
+        if len({len(cell) for cell in cells}) != 1:
+            raise exceptions.IrregularCellSize(cells)
 
     def shifted_by(self, amount=1):
         """Shift the tessellation along by the specified amount."""
@@ -54,15 +59,9 @@ class Tessellation:
             f"{len(self.cells)} cells, first cell: {self.cells[0]})"
 
 
-def line_with_cells(cell_size: int, cell_count: int):
-    """Partition a line into a given number of cells of given size."""
-    return Tessellation([list(range(i*cell_size, (i+1)*cell_size)) for i in range(0, cell_count)])
-
-
 def one_dimensional(num_qubits: int, cell_size: int) -> Tessellation:
     """Partition a line of length num_qubits into cells of size cell_size"""
-    assert num_qubits % cell_size == 0, "The cell size must divide the number of qubits"
-    return line_with_cells(cell_size, int(num_qubits / cell_size))
+    return n_dimensional([num_qubits], [cell_size])
 
 
 def cell_of_given_size(cell_dimension: List[int]) -> List[Vector]:
@@ -87,11 +86,15 @@ def n_dimensional(qubits_in_each_dimension: List[int],
     of qubits in the lattice.
     """
     for index, length in enumerate(qubits_in_each_dimension):
-        assert length % cell_size[index] == 0
+        try:
+            assert length % cell_size[index] == 0
+        except:
+            raise exceptions.IrregularCoordinateDimensions(
+                qubits_in_each_dimension, cell_size) from None
 
     focal_points_as_product = itertools.product(
         *[range(0, qubits_in_each_dimension[index], cell_size[index])
-         for index, _ in enumerate(qubits_in_each_dimension)]
+          for index, _ in enumerate(qubits_in_each_dimension)]
     )
 
     # "Starting" point in each cell
@@ -127,3 +130,6 @@ def vector_to_name(qubit_vector: Vector, qubits_in_each_dimension: List[int]):
         return sum_weighted_lengths(index_entry[0], index_entry[1], acc)
 
     return functools.reduce(unpack, enumerate(qubit_vector.entries), 0)
+
+
+__all__ = ["Tessellation", "one_dimensional", "n_dimensional"]

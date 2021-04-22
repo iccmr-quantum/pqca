@@ -1,29 +1,35 @@
 """Test the Vector class."""
 
-#pylint: disable=import-error
+# pylint: disable=import-error
 import pytest
 import pqca
+from pqca.vector import Vector
 
 
 def test_vector_creation():
     """Create and check equality."""
-    assert pqca.Vector() == pqca.Vector()
-    assert pqca.Vector([1, 2]) == pqca.Vector([1, 2])
-    assert pqca.Vector([1, 2]) != pqca.Vector([2, 1])
+    assert Vector() == Vector()
+    assert Vector([1, 2]) == Vector([1, 2])
+    assert Vector([1, 2]) != Vector([2, 1])
+
+
+def test_entry_access():
+    """Test the __getitem___."""
+    assert Vector([1, 2])[0] == 1
 
 
 def test_vector_extension():
     """Test the .extend function."""
-    assert pqca.Vector().extend(1) == pqca.Vector([1])
-    assert pqca.Vector([2]).extend(1) == pqca.Vector([2, 1])
+    assert Vector().extend(1) == Vector([1])
+    assert Vector([2]).extend(1) == Vector([2, 1])
 
 
 def test_vector_string():
     """Test str(Vector)."""
-    assert str(pqca.Vector([1, 2])) == "Vector[1, 2]"
+    assert str(Vector([1, 2])) == "Vector[1, 2]"
 
 
 def test_vector_arithmetic():
     """Test addition and subtraction."""
-    assert pqca.Vector([1, 1]) + pqca.Vector([2, 3]) == pqca.Vector([3, 4])
-    assert pqca.Vector([1, 1]) - pqca.Vector([2, 3]) == pqca.Vector([-1, -2])
+    assert Vector([1, 1]) + Vector([2, 3]) == Vector([3, 4])
+    assert Vector([1, 1]) - Vector([2, 3]) == Vector([-1, -2])

@@ -1,22 +1,17 @@
-import dataclasses
-import random
+"""Expose ways of evaluating circuits."""
 
-from qiskit import (
-    Aer,
-    execute,
-    QuantumCircuit
-)
+import qiskit
 
-from .exceptions import BackendError
+from . import exceptions
 
 
-def AerQasmSimulator(circuit: QuantumCircuit):
+def Aer(circuit: qiskit.QuantumCircuit, qiskit_backend="qasm_simulator"):
+    """Expose the qiskit Aer Simulator."""
     circuit.measure_all()
-    results = execute(circuit, Aer.get_backend(
-        "qasm_simulator"
+    results = qiskit.execute(circuit, qiskit.Aer.get_backend(
+        qiskit_backend
     ), shots=1).result()
     if results.success:
         final_state_as_string = list(results.get_counts(circuit).keys())[0]
         return [int(x) for x in final_state_as_string[::-1]]
-    else:
-        raise BackendError(results.status)
+    raise exceptions.BackendError(results.status)
