@@ -9,8 +9,10 @@ from .vector import Vector
 
 
 class Tessellation:
-    """Describes how to partition the lattice into cells
-    This is a list of lists of qubits that also performs some data validation"""
+    """Describes how to partition the lattice into cells.
+
+    This is a list of lists of qubits that also performs some validation.
+    """
 
     size: int
 
@@ -39,9 +41,10 @@ class Tessellation:
     def update_names(self,
                      name_update: Callable[[int], int],
                      rename_modulo_size=True) -> Tessellation:
-        """create a new tessellation by renaming every qubit in the old one.
+        """Create a new tessellation by renaming every qubit in the old one.
 
-        This renaming will happen modulo the number of qubits."""
+        This renaming will happen modulo the number of qubits unless asked not to.
+        """
         if rename_modulo_size:
             def make_address_positive(qubit_name):
                 while qubit_name < 0:
@@ -55,12 +58,13 @@ class Tessellation:
             return Tessellation([[name_update(c) for c in cell] for cell in self.cells])
 
     def __str__(self):
+        """Human-readable string representation."""
         return f"Tessellation({self.size} qubits as " +\
             f"{len(self.cells)} cells, first cell: {self.cells[0]})"
 
 
 def one_dimensional(num_qubits: int, cell_size: int) -> Tessellation:
-    """Partition a line of length num_qubits into cells of size cell_size"""
+    """Partition a line of length num_qubits into cells of size cell_size."""
     return n_dimensional([num_qubits], [cell_size])
 
 

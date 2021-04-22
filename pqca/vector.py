@@ -1,11 +1,12 @@
-"""Simple n-dimensional, extendable vector of ints"""
+"""Simple n-dimensional, extendable vector of ints."""
 
 from __future__ import annotations
 from typing import Callable, List, Tuple
 
 
 class Vector:
-    """Wraps a list of entries with helper functions."""
+    """Wrap a list of entries with helper functions."""
+
     entries: List[int]
 
     def __init__(self, entries: List[int] = None):
@@ -41,5 +42,5 @@ class Vector:
         return f"Vector{self.entries}"
 
     def __repr__(self):
-        """Unambiguous strong representation."""
+        """Unambiguous string representation."""
         return str(self)

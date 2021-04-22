@@ -5,6 +5,7 @@ import qiskit
 import pqca
 import pqca.backend
 
+
 def test_create_automaton():
     """1-D automaton, no simulation."""
     cx_circuit = qiskit.QuantumCircuit(2)

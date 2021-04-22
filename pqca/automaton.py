@@ -18,7 +18,8 @@ class Automaton:
         """PQCA with a given initial state, update frames, and backend.
 
         The initialisation and update circuit is constructed from the current state
-        and the update frames."""
+        and the update frames.
+        """
         self.frames = frames
         self.backend = backend
         frame_instructions = map(
@@ -42,18 +43,17 @@ class Automaton:
 
     @property
     def combined_circuit(self):
-        """Combined preparation and update circuit."""
+        """Combine preparation and update circuit."""
         return self.preparation_circuit + self.update_circuit
 
     def tick(self):
-        """Internal function to update the state without returning anything"""
+        """Update the state without returning anything."""
         assert self.backend, "Backend not yet assigned"
         next_pattern = self.backend(self.combined_circuit)
         self.state = next_pattern
 
     def iterate(self, number_of_iterations=1):
-        """Update the state a certain number of times, returning
-        a list of states reached along the way, including the final state"""
+        """Iterate and return new each state reached."""
         pattern_sequence = []
         for _ in range(0, number_of_iterations):
             self.tick()
@@ -61,6 +61,7 @@ class Automaton:
         return pattern_sequence
 
     def __str__(self):
+        """Represent as string."""
         frame_string = f"[{','.join([str(frame) for frame in self.frames])}]"
         return f"PQCA(state={self.state}, frames={frame_string})"
 

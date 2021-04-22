@@ -1,6 +1,4 @@
-"""An UpdateFrame holds cell-circuit and tessellation data.
-
-"""
+"""An UpdateFrame holds cell-circuit and tessellation data."""
 
 import re
 from typing import List
@@ -14,6 +12,7 @@ from .exceptions import (TooLittleDataForUpdateFrame,
 
 class UpdateFrame:
     """Create a large circuit from a tessellated small circuit."""
+
     cell_circuit: QuantumCircuit
     tessellation: Tessellation
     full_circuit_instructions: List
@@ -23,9 +22,7 @@ class UpdateFrame:
                  qasm_circuit_file: str = None,
                  qasm_data_as_string: str = None,
                  qiskit_circuit: QuantumCircuit = None):
-        """Holds the circuit to be applied to each cell in the tessellation.
-
-        """
+        """Hold the circuit to be applied to each cell in the tessellation."""
         count_arguments_not_none: int = len([arg for arg in (
             qasm_circuit_file, qasm_data_as_string, qiskit_circuit) if arg is not None])
         if count_arguments_not_none == 0:
@@ -47,12 +44,12 @@ class UpdateFrame:
             self.cell_circuit, self.tessellation)
 
     def __str__(self):
+        """Human-readable string representation."""
         return f"UpdateFrame(circuit: {self.cell_circuit} on each cell of {str(self.tessellation)})"
 
 
 def wind_circuit_around_loop(circuit: QuantumCircuit, tessellation: Tessellation):
     """Return the tessellated circuit as a list of instructions."""
-
     if len(circuit.qubits) > len(tessellation.cells[0]):
         raise CircuitWrongShapeForCell(
             circuit.qubits, len(tessellation.cells[0]))
