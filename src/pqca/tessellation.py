@@ -15,6 +15,7 @@ class Tessellation:
     """
 
     size: int
+    cells: List[int]
 
     def __init__(self, cells: List[int]):
         """Treat a list of cells as a tessellation."""

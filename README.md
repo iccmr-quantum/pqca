@@ -32,9 +32,9 @@ recording the internal state after each application.
 ## Installation
 
 Install via `pip` from the command line as:
-````
+```
 pip install pqca
-````
+```
 
 ## Example
 

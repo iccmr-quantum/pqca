@@ -19,9 +19,9 @@ class UpdateFrame:
 
     def __init__(self,
                  tessellation: Tessellation,
+                 qiskit_circuit: QuantumCircuit = None,
                  qasm_circuit_file: str = None,
-                 qasm_data_as_string: str = None,
-                 qiskit_circuit: QuantumCircuit = None):
+                 qasm_data_as_string: str = None):
         """Hold the circuit to be applied to each cell in the tessellation."""
         count_arguments_not_none: int = len([arg for arg in (
             qasm_circuit_file, qasm_data_as_string, qiskit_circuit) if arg is not None])
