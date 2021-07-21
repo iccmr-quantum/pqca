@@ -28,7 +28,7 @@ One can then call `next(automaton)` which will advance the internal state of the
 
 ## Installation
 
-Install via `pip` from the command line as:
+Install via `pip` from the command line with the command:
 ```
 pip install pqca
 ```
