@@ -3,14 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Partitioned Quantum Cellular Automata's documentation!
-=================================================================
+Partitioned Quantum Cellular Automata
+=====================================
+
+This is the documentation for the `pqca` package,
+PQCA being short for Partitioned Quantum Cellular Automata.
+Hopefully all the information you need to get yourself started
+can be found in the :doc:`README <README>`,
+with additional information on the :doc:`pqca` page.
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   Readme <README.md>
 
+   modules
 
 Indices and tables
 ==================

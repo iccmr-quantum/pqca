@@ -11,7 +11,7 @@ def test_wind_circuit_around_loop():
     tes = pqca.tessellation.one_dimensional(10, 2)
     cx_circuit = qiskit.QuantumCircuit(2)
     cx_circuit.cx(0, 1)
-    instructions = pqca.update_frame.wind_circuit_around_loop(cx_circuit, tes)
+    instructions = pqca.update_frame._wind_circuit_around_loop(cx_circuit, tes)
     assert len(instructions) == 5
 
 
@@ -20,18 +20,7 @@ def test_wind_circuit_around_loop_exceptions():
     tes = pqca.tessellation.one_dimensional(10, 2)
     cx_circuit = qiskit.QuantumCircuit(3)
     with pytest.raises(pqca.exceptions.CircuitWrongShapeForCell):
-        pqca.update_frame.wind_circuit_around_loop(cx_circuit, tes)
-
-
-def test_update_frame_arguments():
-    """Test problematic combinations of arguments."""
-    tes = pqca.tessellation.one_dimensional(10, 2)
-    with pytest.raises(pqca.exceptions.TooLittleDataForUpdateFrame):
-        pqca.update_frame.UpdateFrame(tes)
-    with pytest.raises(pqca.exceptions.TooMuchDataForUpdateFrame):
-        pqca.update_frame.UpdateFrame(
-            tes, qasm_circuit_file="", qasm_data_as_string="")
-
+        pqca.update_frame._wind_circuit_around_loop(cx_circuit, tes)
 
 def test_update_frame_repr():
     """Test the string representation."""

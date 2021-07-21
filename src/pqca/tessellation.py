@@ -11,14 +11,24 @@ from .vector import Vector
 class Tessellation:
     """Describes how to partition the lattice into cells.
 
-    This is a list of lists of qubits that also performs some validation.
+    This is a list of lists of qubits (expressed as integers) that also performs some validation.
     """
 
     size: int
-    cells: List[int]
+    cells: List[List[int]]
 
-    def __init__(self, cells: List[int]):
-        """Treat a list of cells as a tessellation."""
+    def __init__(self, cells: List[List[int]]):
+        """Treat a list of cells as a tessellation.
+
+        Args:
+            cells (List[List[int]]): List of cells, each cell being a list of ints
+
+        Raises:
+            exceptions.NoCellsException: There should be at least one cell
+            exceptions.EmptyCellException: The first cell must be non-empty
+            exceptions.PartitionUnevenlyCoversQubits: All qubits must be used at most once
+            exceptions.IrregularCellSize: All cells must be the same size
+        """
         if len(cells) == 0:
             raise exceptions.NoCellsException
         if len(cells[0]) == 0:
@@ -35,8 +45,18 @@ class Tessellation:
         if len({len(cell) for cell in cells}) != 1:
             raise exceptions.IrregularCellSize(cells)
 
-    def shifted_by(self, amount=1):
-        """Shift the tessellation along by the specified amount."""
+    def shifted_by(self, amount=1) -> Tessellation:
+        """Shift the tessellation along by the specified amount.
+
+        Equivalent to calling update_names with a function that adds `amount` to every qubit name.
+
+        Args:
+            amount (int, optional): The amount, positive or negative, to increase each qubit's name. Defaults to 1.
+                Acts modulo the number of qubits in the tessellation.
+
+        Returns:
+            Tessellation: A new tessellation with shifted names.
+        """
         return self.update_names(lambda x: x+amount)
 
     def update_names(self,
@@ -44,7 +64,16 @@ class Tessellation:
                      rename_modulo_size=True) -> Tessellation:
         """Create a new tessellation by renaming every qubit in the old one.
 
-        This renaming will happen modulo the number of qubits unless asked not to.
+        The function `name_update` is applied to each current qubit name.
+        This renaming will happen modulo the number of qubits unless explicitly asked not to.
+
+        Args:
+            name_update (Callable[[int], int]): Function to apply to each name.
+            rename_modulo_size (bool, optional): After applying the rename enforce names module the number of qubits.
+                Defaults to True.
+
+        Returns:
+            Tessellation: A new tessellation with the applied renaming.
         """
         if rename_modulo_size:
             def make_address_positive(qubit_name):
@@ -65,12 +94,32 @@ class Tessellation:
 
 
 def one_dimensional(num_qubits: int, cell_size: int) -> Tessellation:
-    """Partition a line of length num_qubits into cells of size cell_size."""
+    """Partition a line of length num_qubits into cells of size cell_size.
+
+    Equivalent to a call to `n_dimensional`.
+
+    Args:
+        num_qubits (int): Number of qubits to partition.
+        cell_size (int): Number of qubits to fit in each cell.
+
+    Returns:
+        Tessellation: Partition of the line into equal-sized cells.
+    """
     return n_dimensional([num_qubits], [cell_size])
 
 
-def cell_of_given_size(cell_dimension: List[int]) -> List[Vector]:
-    """Given a length in each dimension create a cell."""
+def _cell_of_given_size(cell_dimension: List[int]) -> List[Vector]:
+    """Given a length in each dimension create a cell of that size.
+
+    e.g. a `cell_dimension` of [2,3,4] will create a cell of 24 qubits,
+    organised as a 3-dimensional vectors that fill out a cuboid of shape 2 by 3 by 4.
+
+    Args:
+        cell_dimension (List[int]): List of widths of each dimension.
+
+    Returns:
+        List[Vector]: A list of qubits-as-vectors.
+    """
     points_in_first_cell = itertools.product(
         *list(map(lambda d: list(range(0, d)), cell_dimension))
     )
@@ -89,6 +138,16 @@ def n_dimensional(qubits_in_each_dimension: List[int],
 
     Note that the size of the cell must divide (for each dimension) the number
     of qubits in the lattice.
+
+    Args:
+        qubits_in_each_dimension (List[int]): Width in each dimension.
+        cell_size (List[int]): Shape of the cells that will cover all the qubits.
+
+    Raises:
+        exceptions.IrregularCoordinateDimensions: The cells must evenly cover the whole space.
+
+    Returns:
+        Tessellation: A partition of the large space into cells, each cell being a list of qubits.
     """
     for index, length in enumerate(qubits_in_each_dimension):
         try:
@@ -106,24 +165,31 @@ def n_dimensional(qubits_in_each_dimension: List[int],
     focal_points = map(Vector, list(focal_points_as_product))
 
     # Points in first cell
-    points_in_first_cell = cell_of_given_size(cell_size)
+    points_in_first_cell = _cell_of_given_size(cell_size)
 
     # List of list of vectors
     cells_as_vectors = [[focal_point + delta for delta in points_in_first_cell]
                         for focal_point in focal_points]
 
     # List of list of names (as integers)
-    cells = [[vector_to_name(qubit_vector, qubits_in_each_dimension) for qubit_vector in cell]
+    cells = [[_vector_to_name(qubit_vector, qubits_in_each_dimension) for qubit_vector in cell]
              for cell in cells_as_vectors]
 
     return Tessellation(cells)
 
 
-def vector_to_name(qubit_vector: Vector, qubits_in_each_dimension: List[int]):
-    """Find the point in a lexicographic order for a vector.
+def _vector_to_name(qubit_vector: Vector, qubits_in_each_dimension: List[int]) -> int:
+    """Find the equivalent point in a lexicographic order from a vector.
 
     This turns a vector in the lattice into an unique "name" (int),
     allowing a linear collection of qubits to represent a lattice.
+
+    Args:
+        qubit_vector (Vector): A vector representing a single qubit.
+        qubits_in_each_dimension (List[int]): The width of each dimension.
+
+    Returns:
+        int: qubit name, as an integer
     """
     def sum_weighted_lengths(index, length, acc):
         """From an initial segment of qubits_in_each_dimension make a weighting."""
@@ -138,3 +204,27 @@ def vector_to_name(qubit_vector: Vector, qubits_in_each_dimension: List[int]):
 
 
 __all__ = ["Tessellation", "one_dimensional", "n_dimensional"]
+
+"""
+The MIT License (MIT)
+
+Copyright (c) 2021 Hector Miller-Bakewell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""

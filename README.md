@@ -2,15 +2,15 @@
 
 A quantum cellular automaton iteratively applies some update circuit to some initial state.
 A partitioned quantum cellular automaton (PQCA) derives its update circuit by partitioning
-the lattice into cells, and then applying the same circuit to each cell.
+a lattice of qubits into cells, and then applying the same circuit to each cell.
 The full update circuit is created by composing several such partitioned updates.
-There is a review of Quantum Cellular Automata by Terry Farrelly, published in Quantum at [doi:10.22331/q-2020-11-30-368](https://doi.org/10.22331/q-2020-11-30-368).
+There is a review of Quantum Cellular Automata by Terry Farrelly, published in Quantum, and available at [doi:10.22331/q-2020-11-30-368](https://doi.org/10.22331/q-2020-11-30-368).
 
 This python module allows for the easy creation and execution of partitioned quantum cellular automata.
 To create an automaton you will need:
  - A starting state (list of 0s and 1s)
- - Update Frames (see `pqca.update_frame.py`)
- - A simulator / quantum computer (see `pqca.backend.py`)
+ - Update Frames (see `pqca.update_frame`)
+ - A simulator / quantum computer (see `pqca.backend`)
 
 An Update Frame combines a tessellation with a circuit to be applied
 to each cell in that tessellation.
@@ -24,10 +24,7 @@ which partitions 32 qubits as though they were arranged in a lattice
 of shape `4 x 2 x 4`, with each cell of size `2 x 2 x 2`.
 The Update Frame would then need to be a circuit on 8 qubits.
 
-
-The Automaton is called with `automaton.iterate(n)` which will combine all the update frames into one large circuit,
-and apply this circuit `n` times,
-recording the internal state after each application.
+One can then call `next(automaton)` which will advance the internal state of the automaton and return the new state.
 
 ## Installation
 
@@ -49,20 +46,30 @@ cx_circuit.cx(0, 1)
 tes = pqca.tessellation.one_dimensional(10, 2)
 
 # Create update frames
-update_1 = pqca.UpdateFrame(tes, qiskit_circuit=cx_circuit)
-update_2 = pqca.UpdateFrame(tes.shifted_by(1), qiskit_circuit=cx_circuit)
+update_1 = pqca.UpdateFrame(tes, cx_circuit)
+update_2 = pqca.UpdateFrame(tes.shifted_by(1), cx_circuit)
 
 
 # Create initial state
 initial_state = [1]*10
 
-# Specify a backend
-def backend(circuit):
-    return pqca.backend.Aer(circuit, "qasm_simulator")
+# Specify a backend; `pqca.backend.qiskit()` returns IBM's Aer simulator by default
+# See backend.py for more details and instructions on coding your own backend
+backend = pqca.backend.qiskit()
 
 # Create the automaton
 automaton = pqca.Automaton(initial_state, [update_1, update_2], backend)
 
-# Iterate the automaton 5 times
-automaton.iterate(5)
+# The automaton can be called like any other iterator
+# The following line advances the internal state, and returns the new state
+next(automaton)
 ```
+
+## Documentation, Licencing, and Acknowledgements
+
+Detailed documentation can be found at ... as well as
+in the docstrings of the python files themselves.
+The source code is available under the MIT licence and can be found
+at on [Hector Miller-Bakewell's github](https://github.com/hmillerbakewell/partitioned-quantum-cellular-automata).
+This package was created as part of the [QuTune Project](https://iccmr-quantum.github.io/).
+

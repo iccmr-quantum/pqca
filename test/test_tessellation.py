@@ -24,7 +24,7 @@ def test_when_n_is_one():
 
 def test_vector_to_name():
     """Convert a vector to a point in lexicographic order."""
-    vtn = pqca.tessellation.vector_to_name
+    vtn = pqca.tessellation._vector_to_name
     assert vtn(Vector([5]), [6]) == 5
     assert vtn(Vector([5, 0]), [6, 6]) == 5*6
     assert vtn(Vector([0, 0]), [6, 6]) == 0
@@ -37,7 +37,7 @@ def test_vector_to_name():
 
 def test_cell_of_given_size():
     """Test creation of the first cell."""
-    cell = pqca.tessellation.cell_of_given_size([2, 3, 2])
+    cell = pqca.tessellation._cell_of_given_size([2, 3, 2])
     print(cell)
     assert len(cell) == 2*3*2
     assert Vector([0, 0, 0]) in cell
@@ -80,3 +80,10 @@ def test_shift():
     tes_one = tes_zero.shifted_by(1)
     assert tes_one.cells == [[1, 2], [3, 0]]
     assert tes_one.shifted_by(-1).cells == tes_zero.cells
+
+
+def test_shift_not_modulo():
+    """Tessellation.shifted_by."""
+    tes_zero = pqca.tessellation.one_dimensional(4, 2)
+    tes_one = tes_zero.update_names(lambda x: x*2, False)
+    assert tes_one.cells == [[0, 2], [4, 6]]
