@@ -67,7 +67,7 @@ next(automaton)
 
 ## Documentation, Licencing, and Acknowledgements
 
-Detailed documentation can be found at ... as well as
+Detailed documentation can be found at [readthedocs.io](https://partitioned-quantum-cellular-automata.readthedocs.io/en/latest/) as well as
 in the docstrings of the python files themselves.
 The source code is available under the MIT licence and can be found
 at on [Hector Miller-Bakewell's github](https://github.com/hmillerbakewell/partitioned-quantum-cellular-automata).
