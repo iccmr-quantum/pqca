@@ -65,11 +65,17 @@ automaton = pqca.Automaton(initial_state, [update_1, update_2], backend)
 next(automaton)
 ```
 
-## Documentation, Licencing, and Acknowledgements
+## Documentation
 
 Detailed documentation can be found at [readthedocs.io](https://partitioned-quantum-cellular-automata.readthedocs.io/en/latest/) as well as
 in the docstrings of the python files themselves.
+
+## Licensing
+
 The source code is available under the MIT licence and can be found
-at [Hector Miller-Bakewell's github](https://github.com/hmillerbakewell/partitioned-quantum-cellular-automata).
+on [Hector Miller-Bakewell's github](https://github.com/hmillerbakewell/partitioned-quantum-cellular-automata).
+
+## Acknowledgements
+
 This package was created as part of the [QuTune Project](https://iccmr-quantum.github.io/).
 
