@@ -32,7 +32,7 @@ One can then call `next(automaton)` which will advance the internal state of the
 
 ## Making music with PQCA
 
-Check the [tutorials](https://github.com/iccmr-quantum/PQCA_Tutorial/tree/main/PQCA%20Music%20Tutorials) for examples on using the pqca package and learn how to render music from the 1-D and 2-D quantum CA. We show how to save MIDI and Music XML (score) files, which can be uploaded on music editors (e.g., Sibelius and MuseScore) for composing.
+Check the [tutorials](https://github.com/iccmr-quantum/PQCA_Tutorial/tree/main/PQCA%20Music%20Tutorials) for examples on using the pqca package and learn how to render music from the 1-D and 2-D quantum CA. We show how to save MIDI and Music XML (score) files, which can be uploaded to music editors (e.g., Sibelius and MuseScore).
 
 ## Installation
 
