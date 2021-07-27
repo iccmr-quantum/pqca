@@ -30,6 +30,10 @@ The Update Frame would then need to be a circuit on 8 qubits.
 
 One can then call `next(automaton)` which will advance the internal state of the automaton and return the new state.
 
+## Making music with PQCA
+
+Check the [tutorials](https://github.com/iccmr-quantum/PQCA_Tutorial/tree/main/PQCA%20Music%20Tutorials) for examples on using the pqca package and learn how to render music from the behaviour of 1-D and 2-D quantum CA. We show how to save MIDI and Music XML (score) files, which can be uploaded on music editors (e.g., Sibelius and MuseScore) for composing.
+
 ## Installation
 
 Install via `pip` from the command line with the command:
