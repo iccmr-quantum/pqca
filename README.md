@@ -1,9 +1,7 @@
 
 # PQCA (Partitioned Quantum Cellular Automata)
 
-------------------------------------------------------------------------------------
 ![qutune-logo-2](https://user-images.githubusercontent.com/46610354/118358892-c9b94f80-b578-11eb-8e3b-2ffdb783e2c4.png)
-------------------------------------------------------------------------------------
 
 
 A quantum cellular automaton iteratively applies some update circuit to some initial state.
