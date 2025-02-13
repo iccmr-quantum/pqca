@@ -1,5 +1,6 @@
+# This repository is outdated. You can find the most recent implementation in the fork: [iccmr-quantum/partitioned-quantum-cellular-automata](https://github.com/iccmr-quantum/partitioned-quantum-cellular-automata)
+## Partitioned Quantum Cellular Automata (PQCA)
 
-# Partitioned Quantum Cellular Automata (PQCA)
 
 ![qutune-logo-2](https://user-images.githubusercontent.com/46610354/118358892-c9b94f80-b578-11eb-8e3b-2ffdb783e2c4.png)
 
